@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Video Feed</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* CSS */
+        .button-37 {
+            background-color: #13aa52;
+            border: 1px solid #13aa52;
+            border-radius: 4px;
+            box-shadow: rgba(0, 0, 0, .1) 0 2px 4px 0;
+            color: #fff;
+            cursor: pointer;
+            font-family: "Akzidenz Grotesk BQ Medium", -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 16px;
+            font-weight: 400;
+            outline: none;
+            padding: 10px 25px;
+            text-align: center;
+            transition: transform 150ms, box-shadow 150ms;
+            user-select: none;
+        }
+
+        .button-37:hover {
+            box-shadow: rgba(0, 0, 0, .15) 0 3px 9px 0;
+            transform: translateY(-2px);
+        }
+
+        .button-38 {
+            background-color: #e01d1d;
+            border: 1px solid #e01d1d;
+            border-radius: 4px;
+            box-shadow: rgba(0, 0, 0, .1) 0 2px 4px 0;
+            color: #fff;
+            cursor: pointer;
+            font-family: "Akzidenz Grotesk BQ Medium", -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 16px;
+            font-weight: 400;
+            outline: none;
+            padding: 10px 25px;
+            text-align: center;
+            transition: transform 150ms, box-shadow 150ms;
+            user-select: none;
+        }
+
+        .button-38:hover {
+            box-shadow: rgba(0, 0, 0, .15) 0 3px 9px 0;
+            transform: translateY(-2px);
+        }
+
+        @media (min-width: 768px) {
+            .button-37 {
+                padding: 10px 30px;
+            }
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            position: relative;
+        }
+        canvas {
+            width: 400px; /* Adjust as needed */
+            height: 320px; /* Maintain aspect ratio */
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 2px solid #000; /* Add a thick border */
+        }
+        video {
+            width: 400px; /* Adjust as needed */
+            height: 320px; /* Maintain aspect ratio */
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 2px solid #000; /* Add a thick border */
+        }
+
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px; /* Add space between buttons and canvas */
+        }
+
+        #loadingMessage {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="sidebar" class="side-bar">
+        <div id="close-btn">
+            <i class="fas fa-times"></i>
+        </div>
+        <nav class="navbar">
+            <a href="/recognize"><i class="fas fa-eye"></i> Recognize</a>
+            <a href="/faces"><i class="fas fa-edit"></i> Modify</a>
+            <a href="/analyze"><i class="fas fa-list"></i> Dashboard</a>
+            <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <main role="main" class="main-content">
+        <div class="container">
+            <video id="video" width="400" height="320" autoplay></video>
+            <canvas id="processedCanvas" width="400" height="320"></canvas>
+            <div id="loadingMessage">Processing, please wait...</div>
+        </div>
+    </main>
+
+    <script>
+        let stream;
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('processedCanvas');
+        const context = canvas.getContext('2d');
+        let isStreaming = false;
+
+        async function startStreaming() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                video.play();
+                isStreaming = true;
+                sendFrames(); // Start sending frames
+            } catch (error) {
+                console.error('Error accessing webcam:', error);
+            }
+        }
+
+        function stopStreaming() {
+            if (stream) {
+                video.srcObject = null;
+                stream.getTracks().forEach(track => track.stop());
+                isStreaming = false;
+            }
+        }
+
+        async function sendFrames() {
+            if (!isStreaming) return;
+
+            // Draw the video frame onto the canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const frame = canvas.toDataURL('image/jpeg');
+
+            if (!frame || !frame.startsWith('data:image/jpeg;base64,')) {
+                console.error('Frame data is not valid:', frame);
+                return;
+            }
+
+            try {
+                const response = await fetch('/process_frame', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ frame })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.processed_frame) {
+                        // Convert the Base64 image data to an Image and draw it on the canvas
+                        const img = new Image();
+                        img.onload = function() {
+                            context.clearRect(0, 0, canvas.width, canvas.height);
+                            context.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        };
+                        img.src = data.processed_frame;
+
+                        // Example of handling bounding boxes
+                        if (data.bounding_boxes && Array.isArray(data.bounding_boxes)) {
+                            data.bounding_boxes.forEach(box => {
+                                const { x, y, width, height, label } = box;
+
+                                // Debugging: Log coordinates and dimensions
+                                console.log('Drawing box:', { x, y, width, height });
+
+                                context.beginPath();
+                                context.rect(x, y, width, height);
+                                context.lineWidth = 2;
+                                context.strokeStyle = 'blue'; // Bounding box color
+                                context.stroke();
+                                context.font = '16px Arial';
+                                context.fillStyle = 'blue'; // Label color
+                                context.fillText(label, x, y > 10 ? y - 5 : 10);
+                            });
+                        } else {
+                            console.error('Bounding boxes not found in response:', data);
+                        }
+                    } else {
+                        console.error('Processed frame not found in response:', data);
+                    }
+                } else {
+                    console.error('Failed to send frame:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+
+            // Continue sending frames
+            requestAnimationFrame(sendFrames);
+        }
+
+        // Automatically start streaming when the page loads
+        window.onload = function() {
+            startStreaming();
+        };
+
+        // Stop the streaming when logging out
+        document.querySelector('a[href="/logout"]').addEventListener('click', function() {
+            stopStreaming();
+        });
+    </script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/js/all.min.js"></script>
+</body>
+</html>
