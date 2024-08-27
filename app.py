@@ -30,7 +30,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.secret_key = 'secret_key'
 db = SQLAlchemy(app)
-ngrok.set_auth_token('2j6yZx3KvVeSEOhGHG0bEjNdWB8_2ri6c36iDuZZxMJxxCD47')
+ngrok.set_auth_token('') # put ng rok token 
 
 known_face_encodings, known_face_names, known_face_metadata = load_encodings()
 class User(db.Model):
@@ -593,6 +593,6 @@ def process_frame_endpoint():
 
 # Run the application
 if __name__ == '__main__':
-    public_url = ngrok.connect(5000)
-    print("Public URL:", public_url)
-    app.run()
+    #public_url = ngrok.connect(5000)
+    #print("Public URL:", public_url)
+    app.run(debug=True)
