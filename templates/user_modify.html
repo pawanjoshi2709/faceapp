@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modify Face</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
     <style>
         body {
             margin: 0;
@@ -14,61 +14,78 @@
 
         h1 {
             text-align: center;
-            margin-bottom: 40px; /* Increased space below the heading */
+            margin-bottom: 40px;
         }
 
         .container {
             display: flex;
-            align-items: flex-start; /* Align items to the top */
-            justify-content: center; /* Center items horizontally */
-            gap: 30px; /* Space between the image and the form */
+            align-items: flex-start;
+            justify-content: center;
+            gap: 30px;
             margin-top: 20px;
-            flex-wrap: wrap; /* Allow wrapping for smaller screens */
+            flex-wrap: wrap;
         }
 
         .face {
-            width: 350px; /* Fixed width */
-            height: 350px; /* Fixed height */
-            border-radius: 8px; /* Rounded corners for the image */
-            object-fit: cover; /* Ensure the image covers the fixed size */
-            border: 2px solid #ddd; /* Border around the image */
+            width: 350px;
+            height: 350px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid #ddd;
         }
 
         .form-container {
             display: flex;
-            flex-direction: column; /* Stack form elements vertically */
-            width: 100%; /* Full width of the form container */
-            max-width: 600px; /* Max width for the form */
+            flex-direction: column;
+            width: 100%;
+            max-width: 600px;
         }
 
         label {
-            font-weight: bold; /* Make label text bold */
-            font-size: 1.1rem; /* Increase font size of labels */
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        #email {
+            background-color: #f1f1f1;
+            pointer-events: none; /* Make the email input non-clickable */
         }
 
         @media (max-width: 768px) {
             .container {
-                flex-direction: column; /* Stack image and form vertically on smaller screens */
+                flex-direction: column;
                 align-items: center;
             }
 
             .face {
-                width: 100%; /* Full width of the container on small screens */
-                height: auto; /* Maintain aspect ratio */
+                width: 100%;
+                height: auto;
             }
 
             .form-container {
-                width: 100%; /* Full width of the container on small screens */
+                width: 100%;
             }
         }
 
-        /* Style for flash messages */
         .alert-container {
             margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
+
+    <div id="sidebar" class="side-bar">
+        <div id="close-btn">
+            <i class="fas fa-times"></i>
+        </div>
+        <nav class="navbar">
+            <a href="{{ url_for('user_dashboard') }}"><i class="fas fa-eye"></i> Dashboard</a>
+            <a href="{{ url_for('user_modify_face') }}"><i class="fas fa-edit"></i> Modify</a>
+            <a href="{{ url_for('user_change_password') }}"><i class="fas fa-list"></i> Change Password</a>
+            <a href="{{ url_for('user_logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
     <div class="container mt-4">
         <h1>Modify Face Data</h1>
 
@@ -86,43 +103,43 @@
         {% endwith %}
 
         <div class="container">
-            <img src="{{ url_for('serve_image', face_id=face[0]) }}" class="face" alt="Face Image">
+            <img src="{{ url_for('user_serve_image') }}" class="face" alt="Face Image">
     
             <div class="form-container">
-                <form action="{{ url_for('update_face', face_id=face[0]) }}" method="post">
+                <form action="{{ url_for('user_modify_face') }}" method="post">
                     <div class="form-group">
                         <label for="name">Name</label>
-                        <input type="text" class="form-control" id="name" name="name" value="{{ face[1] }}" required>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ face_data[0] }}" required>
                     </div>
                     <div class="form-group">
                         <label for="phone1">Phone Number 1</label>
-                        <input type="text" class="form-control" id="phone1" name="phone1" value="{{ face[2] }}" required>
+                        <input type="text" class="form-control" id="phone1" name="phone1" value="{{ face_data[1] }}" required>
                     </div>
                     <div class="form-group">
                         <label for="phone2">Phone Number 2 (Optional)</label>
-                        <input type="text" class="form-control" id="phone2" name="phone2" value="{{ face[3] }}">
+                        <input type="text" class="form-control" id="phone2" name="phone2" value="{{ face_data[2] }}">
                     </div>
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" value="{{ face[4] }}">
+                        <input type="email" class="form-control" id="email" name="email" value="{{ face_data[3] }}" readonly>
                     </div>
                     <div class="form-group">
                         <label for="address">Address</label>
-                        <textarea class="form-control" id="address" name="address" rows="3">{{ face[5] }}</textarea>
+                        <textarea class="form-control" id="address" name="address" rows="3">{{ face_data[4] }}</textarea>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="state">State</label>
-                            <input type="text" class="form-control" id="state" name="state" value="{{ face[6] }}">
+                            <input type="text" class="form-control" id="state" name="state" value="{{ face_data[5] }}">
                         </div>
                         <div class="form-group col-md-6">
                             <label for="city">City</label>
-                            <input type="text" class="form-control" id="city" name="city" value="{{ face[7] }}">
+                            <input type="text" class="form-control" id="city" name="city" value="{{ face_data[6] }}">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="country">Country</label>
-                        <input type="text" class="form-control" id="country" name="country" value="{{ face[8] }}">
+                        <input type="text" class="form-control" id="country" name="country" value="{{ face_data[7] }}">
                     </div>
                     <button type="submit" class="btn btn-primary">Update</button>
                 </form>

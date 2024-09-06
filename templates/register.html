@@ -44,6 +44,15 @@
     .btn-login:hover {
       background-color: #0056b3;
     }
+    .btn-home {
+      margin-top: 10px;
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+    }
+    .btn-home:hover {
+      background-color: #218838;
+    }
   </style>
 </head>
 <body>
@@ -51,6 +60,21 @@
 <div class="container">
     <div class="register-container">
         <h2 class="text-center">Register Form</h2>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert alert-dismissible fade show" role="alert">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endif %}
+        {% endwith %}
+
         <form action="/register" method="POST">
             <div class="form-group">
                 <label for="name">Name:</label>
@@ -69,6 +93,7 @@
 
             <button type="submit" class="btn btn-custom btn-block">Submit</button>
             <a href="/login" class="btn btn-login btn-block">Login</a>
+            <a href="/" class="btn btn-home btn-block">Go Back Home</a>
         </form>
     </div>
 </div>

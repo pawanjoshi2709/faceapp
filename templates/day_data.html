@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Day Data Analysis</title>
+    <style>
+        .container {
+            margin-top: 2rem;
+        }
+        .chart-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .filter-container {
+            margin-bottom: 20px;
+        }
+        .filter-container label {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar" class="side-bar">
+        <div id="close-btn">
+            <i class="fas fa-times"></i>
+        </div>
+        <nav class="navbar">
+            <a href="/recognize"><i class="fas fa-eye"></i> Recognize</a>
+            <a href="/faces"><i class="fas fa-edit"></i> Modify</a>
+            <a href="/analyze"><i class="fas fa-list"></i> Dashboard</a>
+            <a href="/day_dashboard"><i class="fas fa-calendar-day"></i> Day Dashboard</a>
+            <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="container">
+        <h1 class="text-center">Day Data Analysis</h1>
+        
+        <div class="filter-container text-center">
+            <form id="filter-form" method="get" action="/day_dashboard">
+                <label for="date-select">Select Date:</label>
+                <input type="date" id="date-select" name="date" value="{{ selected_date }}" required>
+                
+                <label for="country-select">Country:</label>
+                <select id="country-select" name="country">
+                    <option value="">Select Country</option>
+                    {% for country in country_options %}
+                        <option value="{{ country }}" {% if selected_country == country %}selected{% endif %}>{{ country }}</option>
+                    {% endfor %}
+                </select>
+                
+                <label for="state-select">State:</label>
+                <select id="state-select" name="state" {% if not selected_country %}disabled{% endif %}>
+                    <option value="">Select State</option>
+                    {% for state in state_options %}
+                        <option value="{{ state }}" {% if selected_state == state %}selected{% endif %}>{{ state }}</option>
+                    {% endfor %}
+                </select>
+                
+                <label for="city-select">City:</label>
+                <select id="city-select" name="city" {% if not selected_state %}disabled{% endif %}>
+                    <option value="">Select City</option>
+                    {% for city in city_options %}
+                        <option value="{{ city }}" {% if selected_city == city %}selected{% endif %}>{{ city }}</option>
+                    {% endfor %}
+                </select>
+                
+                <button type="submit" class="btn btn-primary">Apply Filters</button>
+            </form>
+        </div>
+
+        <div class="chart-container">
+            <h2>Attendance Count Chart</h2>
+            <div id="day-chart">
+                {{ day_chart_html | safe }}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#country-select').change(function() {
+                const country = $(this).val();
+                $.get('/get_states', { country: country }, function(data) {
+                    $('#state-select').empty().append('<option value="">Select State</option>');
+                    $.each(data.states, function(index, state) {
+                        $('#state-select').append('<option value="' + state + '">' + state + '</option>');
+                    });
+                    $('#state-select').prop('disabled', !country);
+                    $('#city-select').empty().append('<option value="">Select City</option>').prop('disabled', true);
+                });
+            });
+
+            $('#state-select').change(function() {
+                const state = $(this).val();
+                const country = $('#country-select').val();
+                $.get('/get_cities', { country: country, state: state }, function(data) {
+                    $('#city-select').empty().append('<option value="">Select City</option>');
+                    $.each(data.cities, function(index, city) {
+                        $('#city-select').append('<option value="' + city + '">' + city + '</option>');
+                    });
+                    $('#city-select').prop('disabled', !state);
+                });
+            });
+
+            // Pre-select values if already selected
+            const selectedCountry = "{{ selected_country }}";
+            const selectedState = "{{ selected_state }}";
+            const selectedCity = "{{ selected_city }}";
+
+            if (selectedCountry) {
+                $('#country-select').val(selectedCountry).change();
+            }
+            if (selectedState) {
+                $('#state-select').val(selectedState).change();
+            }
+            if (selectedCity) {
+                $('#city-select').val(selectedCity);
+            }
+        });
+    </script>
+</body>
+</html>

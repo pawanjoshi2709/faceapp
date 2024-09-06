@@ -12,13 +12,16 @@ idna==2.10
 imageio==2.9.0
 imageio-ffmpeg==0.4.2
 moviepy==1.0.3
-numpy==1.23.4
+numpy
 Pillow
 proglog
 requests==2.24.0
 tqdm==4.51.0
 urllib3==1.25.11
 wincertstore==0.2
-pandas==2.1.0
-plotly==5.10.0
-bcrypt==4.0.1pandas==2.1.0 numpy
+pandas
+plotly
+bcrypt==4.0.1
+flask_sqlalchemy 
+PIL
+re

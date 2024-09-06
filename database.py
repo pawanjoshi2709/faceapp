@@ -10,9 +10,9 @@ c.execute('''
     CREATE TABLE IF NOT EXISTS faces (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
-        mobile_number_1 TEXT,
-        mobile_number_2 TEXT,
-        email_id TEXT,
+        mobile_number_1 INTEGER,
+        mobile_number_2 INTEGER,
+        email_id TEXT UNIQUE,
         address TEXT,
         state TEXT,
         city TEXT,
@@ -32,6 +32,14 @@ c.execute('''
         start_time TEXT,
         total_time REAL,
         FOREIGN KEY (face_id) REFERENCES faces(id)
+    )
+''')
+c.execute('''
+    CREATE TABLE IF NOT EXISTS userlogin (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        gmail TEXT UNIQUE,
+        password TEXT,
+        FOREIGN KEY (gmail) REFERENCES faces(email_id)
     )
 ''')
 

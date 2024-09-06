@@ -42,12 +42,12 @@ def inspect_specific_tables():
     cursor = conn.cursor()
     
     # Inspect the 'faces' table
-    print("\nContents of the 'recognition_logs' table:")
-    cursor.execute("PRAGMA table_info(recognition_logs);")  # Get column names for 'faces'
+    print("\nContents of the 'userlogin' table:")
+    cursor.execute("PRAGMA table_info(userlogin);")  # Get column names for 'faces'
     columns = [description[1] for description in cursor.fetchall()]
     print("Columns:", columns)
     
-    cursor.execute("SELECT * FROM recognition_logs;")
+    cursor.execute("SELECT * FROM userlogin;")
     faces_data = cursor.fetchall()
     for row in faces_data:
         print(row)

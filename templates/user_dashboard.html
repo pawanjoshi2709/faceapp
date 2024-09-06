@@ -48,6 +48,9 @@
             text-align: center;
             margin-bottom: 30px;
         }
+        .alert {
+            margin-top: 15px; /* Space above flash messages */
+        }
     </style>
 </head>
 <body>
@@ -57,16 +60,28 @@
             <i class="fas fa-times"></i>
         </div>
         <nav class="navbar">
-            <a href="/recognize"><i class="fas fa-eye"></i> Recognize</a>
-            <a href="/faces"><i class="fas fa-edit"></i> Modify</a>
-            <a href="/analyze"><i class="fas fa-list"></i> Dashboard</a>
-            <a href="/day_dashboard"><i class="fas fa-calendar-day"></i> Day Dashboard</a>
-            <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <a href="{{ url_for('user_dashboard') }}"><i class="fas fa-eye"></i> Dashboard</a>
+            <a href="{{ url_for('user_modify_face') }}"><i class="fas fa-edit"></i> Modify</a>
+            <a href="{{ url_for('user_change_password') }}"><i class="fas fa-list"></i> Change Password</a>
+            <a href="{{ url_for('user_logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </div>
 
     <div class="container mt-4">
-        <h1 class="text-center">Face Analysis</h1>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                <div class="container">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <h1 class="text-center">Welcome</h1>
 
         <div class="presence-status">
             {{ presence_status }}
@@ -78,7 +93,7 @@
                 <label for="day-month-select">Select Month and Year:</label>
                 <input type="month" id="day-month-select" class="form-control" onchange="updateChart('day')" value="{{ current_month }}">
             </div>
-            <h2 class="text-center">Day wise present count</h2>
+            <h2 class="text-center">Day Wise Present Count</h2>
             <div id="day-chart" class="chart-container">
                 {{ day_chart_html | safe }}
             </div>
@@ -90,7 +105,7 @@
                 <label for="month-year-select">Select Year:</label>
                 <input type="number" id="month-year-select" class="form-control" onchange="updateChart('month')" value="{{ current_year }}" min="2000">
             </div>
-            <h2 class="text-center">Monthly wise present Counts</h2>
+            <h2 class="text-center">Monthly Wise Present Counts</h2>
             <div id="month-chart" class="chart-container">
                 {{ month_chart_html | safe }}
             </div>
@@ -103,7 +118,7 @@
                 <input type="number" id="year-select-start" class="form-control" placeholder="Start Year" onchange="updateChart('year')" value="{{ current_year }}" min="2000">
                 <input type="number" id="year-select-end" class="form-control" placeholder="End Year" onchange="updateChart('year')" value="{{ current_year }}" min="2000">
             </div>
-            <h2 class="text-center">Yearly wise present Counts</h2>
+            <h2 class="text-center">Yearly Wise Present Counts</h2>
             <div id="year-chart" class="chart-container">
                 {{ year_chart_html | safe }}
             </div>
@@ -114,10 +129,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script>
-        const faceId = "{{ face_id }}";
-
         function updateChart(chartType) {
-            let url = `/analyze/${faceId}?`;
+            let url = `/user/dashboard?`;
 
             if (chartType === 'day') {
                 const dayMonth = document.getElementById('day-month-select').value;
