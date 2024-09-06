@@ -27,7 +27,7 @@ app.secret_key = 'secret_key'
 
 db = SQLAlchemy(app)
 
-ngrok.set_auth_token('2j6yZx3KvVeSEOhGHG0bEjNdWB8_2ri6c36iDuZZxMJxxCD47')
+#ngrok.set_auth_token('')
 
 
 
@@ -994,7 +994,7 @@ def process_frame_endpoint():
 # Run the application
 
 if __name__ == '__main__':
-    public_url = ngrok.connect(5000)
-    print("Public URL:", public_url)
+    #public_url = ngrok.connect(5000)
+    #print("Public URL:", public_url)
 
-    app.run()
+    app.run(debug=True)

@@ -19,7 +19,6 @@ import time
 import io
 import base64
 import cv2
-import hashlib
 import numpy as np
 import bcrypt
 
