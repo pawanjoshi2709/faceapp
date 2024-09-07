@@ -1,6 +1,6 @@
-from flask import Flask, request,jsonify,Response,render_template, redirect,session, url_for ,send_file, flash,logging
+from flask import Flask, request,jsonify,render_template, redirect,session, url_for ,send_file, flash,logging
 from flask_sqlalchemy import SQLAlchemy
-from func import fetch_data, fetch_faces, fetch_image, fetch_recognition_logs,get_head_password, insert_userlogin, plot_charts ,process_frame_data,validate_email,validate_phone_number,check_user_credentials
+from func import fetch_data, fetch_faces,  fetch_recognition_logs,get_head_password, insert_userlogin, plot_charts ,process_frame_data,validate_email,validate_phone_number,check_user_credentials
 from func import   query_face_by_email,update_password_user,fetch_recognition_logs_day,plot_day_chart,get_db_connection_login
 import pandas as pd
 import plotly.express as px

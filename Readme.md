@@ -1,6 +1,8 @@
 got to the file location in command prompt/bash/anaconda prompt and put this command
 
-conda create -n myenv python=3.9.19 -y
+cd faceapp
+
+conda create -p myenv python=3.9 -y
 
 conda activate myenv/
 

@@ -7,8 +7,7 @@ import pickle
 import numpy as np
 import pickle
 import random
-import os
-import urllib.request
+
 
 
 def save_face(image_path, name=None, mobile_number_1=None, mobile_number_2=None, email_id=None, address=None, state=None, city=None, country=None):

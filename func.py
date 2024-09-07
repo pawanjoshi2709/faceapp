@@ -1,12 +1,12 @@
 import sqlite3
-from flask import flash ,send_file, redirect, url_for
+from flask import flash 
 from io import BytesIO
 from PIL import Image
 import pandas as pd
 import plotly.express as px
 import plotly.io as pio
 from datetime import datetime
-from model import save_face,load_encodings,is_unknown_face_in_database,log_recognition, is_encoding_in_database
+from model import save_face,load_encodings,log_recognition
 import face_recognition
 import re
 

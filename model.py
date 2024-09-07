@@ -2,7 +2,6 @@ import pickle
 import cv2
 import face_recognition
 import sqlite3
-import numpy as np
 from datetime import datetime
 
 def save_face(name, mobile_number_1, encoding, frame, mobile_number_2=None, email_id=None, address=None, state=None, city=None, country=None):
